@@ -1,0 +1,17 @@
+# Local environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+backend/.venv/
+
+# Local database
+dev.db
+
+# Node
+node_modules/
+/dist
+
+# Docker
+*.log
