@@ -1,67 +1,41 @@
-# Inventory & Order Management System
+Inventory and Order Management System
 
-This repository contains a simple inventory and order management app. The backend is written in FastAPI and the frontend is a React app. There is also a Docker Compose setup so you can run the whole thing locally with a database.
+This repo has a small app that keeps track of products, customers and orders. The backend is built with FastAPI and the frontend is built with React. There is also a Docker Compose setup so you can run everything locally with a database.
 
-The app is designed to keep track of products, customers and orders. It reduces inventory when orders are created and it has some basic validation so you can get a working demo quickly.
+The backend code is in the backend folder and the frontend code is in the frontend folder. The docker-compose.yml file at the project root starts everything together.
 
-The backend lives in the `backend` folder. The frontend is in `frontend`. The `docker-compose.yml` file at the root brings everything up together.
+Running it locally
 
-## Running it locally
+To run this on your machine, copy backend/.env.example to backend/.env. By default the backend uses SQLite.
 
-To run it locally, copy `backend/.env.example` to `backend/.env`. By default the backend uses SQLite when `DB_TYPE=sqlite`.
+Then go into the backend folder and start the backend server with uvicorn. In another terminal open the frontend folder and start the React dev server.
 
-Then start the backend:
+The frontend should open at http://localhost:5173 and the backend docs should be available at http://localhost:8000/docs.
 
-```bash
-cd backend
-python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
-```
+If you want to use PostgreSQL with Docker Desktop, set DB_TYPE=postgres in backend/.env and run docker compose up --build from the project root. That will start the database, backend, and frontend together.
 
-In another terminal, start the frontend:
+Docker Hub publishing
 
-```bash
-cd frontend
-npm run dev
-```
+There is a GitHub Actions workflow in .github/workflows/dockerhub-publish.yml that can publish the backend Docker image to Docker Hub.
 
-The frontend should load at `http://localhost:5173` and the backend docs are available at `http://localhost:8000/docs`.
+To make that work, add two repository secrets named DOCKERHUB_USERNAME and DOCKERHUB_TOKEN. After that the workflow can log in and push the image.
 
-If you have Docker Desktop and want to use PostgreSQL, set `DB_TYPE=postgres` in `backend/.env`, then run this from the root folder:
+The image will be published as docker.io/your-username/inventory-order-system-backend:latest.
 
-```bash
-docker compose up --build
-```
+Frontend deployment
 
-That will start PostgreSQL, the backend, and the frontend together.
+There is also a workflow for deploying the frontend to GitHub Pages. It builds the frontend and publishes it to the gh-pages branch.
 
-## Docker Hub publishing
-There is a GitHub Actions workflow at `.github/workflows/dockerhub-publish.yml` that can publish the backend Docker image to Docker Hub.
+That workflow needs GitHub Pages enabled in the repository settings and permission to publish to the branch.
 
-To get it working, add two repository secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`. Once those are set, the workflow can log in and push the image.
+Backend deployment to Render
 
-The image will be pushed as:
+A separate workflow can trigger a Render deployment if you add RENDER_SERVICE_ID and RENDER_API_KEY as repository secrets.
 
-```text
-docker.io/<your-username>/inventory-order-system-backend:latest
-```
+That workflow will not deploy anything until those secrets are set and a Render service is configured for this repo.
 
-## Frontend deployment
-There is also a workflow for deploying the frontend to GitHub Pages. It builds the frontend and publishes it to the `gh-pages` branch.
+If you only want the backend
 
-That needs GitHub Pages enabled in the repository settings, and the workflow needs permission to publish to the branch.
+If you only want to run the backend without Docker, make sure PostgreSQL is running locally and set POSTGRES_HOST=localhost in backend/.env.
 
-# Backend deployment to Render
-A separate workflow can trigger a Render deployment if you add `RENDER_SERVICE_ID` and `RENDER_API_KEY` as repository secrets.
-
-That workflow does not deploy anything until those secrets are configured and a Render service is set up to use this repo.
-
-# If you only want the backend
-
-If you just want to run the backend without Docker, make sure PostgreSQL is running locally and set `POSTGRES_HOST=localhost` in `backend/.env`.
-
-Then start the backend with:
-
-```bash
-cd backend
-python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
-```
+Then start the backend from the backend folder with uvicorn.
