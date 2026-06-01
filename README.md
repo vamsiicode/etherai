@@ -1,90 +1,39 @@
 # Inventory & Order Management System
 
-A simple inventory and order management app built with FastAPI, React, PostgreSQL, and Docker Compose.
+This project is a small inventory and order management system. The backend is built with FastAPI and the frontend is built with React. There is also a local Docker setup so you can run everything together.
 
-## Features
-- Products with unique SKU and stock count
-- Customers with unique email
-- Orders with stock reduction and validation
-- Basic React UI to manage products, customers, and orders
-- Dockerized backend, frontend, and PostgreSQL
+The backend handles products, customers and orders, with stock tracking and basic validation. The frontend is a simple React app that talks to the API and lets you manage the data.
 
 ## Project structure
-- `backend/` - Python FastAPI API
-- `frontend/` - React frontend
-- `docker-compose.yml` - local dev stack
+The backend code is in the `backend` folder and the frontend code is in the `frontend` folder. There is also a `docker-compose.yml` file at the root for running the full app locally.
 
 ## Run locally
-1. Copy `.env.example` to `.env`
-2. By default, the backend uses local SQLite when `DB_TYPE=sqlite`.
-3. Start the backend:
-   ```bash
-   cd backend
-   .venv\Scripts\Activate.ps1
-   python -m uvicorn --app-dir . app:app --reload --host 0.0.0.0 --port 8000
-   ```
-4. Start the frontend:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-5. Open frontend at `http://localhost:5173`
-6. Open API docs at `http://localhost:8000/docs`
+If you want to run the app on your machine, first copy `.env.example` to `.env` in the backend folder. By default the backend uses SQLite when `DB_TYPE=sqlite`.
 
-### Docker Compose
-If Docker Desktop is installed, use PostgreSQL by setting `DB_TYPE=postgres` in `backend/.env` or by using the compose override. Then run:
-```bash
-cd C:\Users\CHAGANTI\CODING\projects\inventory-order-system
-docker compose up --build
-```
+To start the backend locally, go to the `backend` folder and run the app with uvicorn. Then go to the `frontend` folder and start the React dev server.
 
-The backend will be available at `http://localhost:8000` and the frontend at `http://localhost:5173`.
+The backend should be available on `http://localhost:8000` and the frontend on `http://localhost:5173`. The API docs are available at `http://localhost:8000/docs`.
 
-### Docker Hub publish workflow
-A GitHub Actions workflow has been added to publish the backend Docker image to Docker Hub when the repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` are configured.
+If you have Docker Desktop and want to use PostgreSQL, set `DB_TYPE=postgres` in `backend/.env`, then run `docker compose up --build` from the project root.
 
-- Set `DOCKERHUB_USERNAME` to your Docker Hub username.
-- Set `DOCKERHUB_TOKEN` to a Docker Hub access token.
+## Docker Hub publishing
+There is a workflow in `.github/workflows/dockerhub-publish.yml` that can publish the backend image to Docker Hub when the right secrets are set.
 
-The pushed image tag will be:
+The secrets are named `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`. If those are not set, the workflow will now stop and tell you which secret is missing.
 
-```text
-${{ secrets.DOCKERHUB_USERNAME }}/inventory-order-system-backend:latest
-```
+When it works, the backend image is pushed as `docker.io/<your-username>/inventory-order-system-backend:latest`.
 
-### GitHub Pages frontend deployment
-A GitHub Actions workflow has been added to build and deploy the frontend to GitHub Pages on pushes to `main`/`master`.
+## Frontend deployment
+There is also a workflow for deploying the frontend to GitHub Pages, and it builds the app for a project site at `/etherai/`.
 
-- The workflow publishes `frontend/dist` to the `gh-pages` branch.
-- The frontend build uses `VITE_BASE=/etherai/` so it works as a GitHub Pages project site.
-- Set `VITE_API_URL` in your deployed environment or in the built site if you point the frontend at a hosted backend.
+To use that, the site needs to be enabled from the repository Pages settings and the workflow must be allowed to publish to the `gh-pages` branch.
 
-After the first successful run, the site should be available at:
+## Backend deployment to Render
+The backend has a workflow that can trigger a Render deploy when `RENDER_SERVICE_ID` and `RENDER_API_KEY` are set.
 
-```text
-https://<your-github-username>.github.io/etherai/
-```
+That workflow does not deploy by itself until those secrets are added and a Render service is configured to use this repository.
 
-### Backend deployment to Render
-A GitHub Actions workflow has been added to trigger a Render deploy for the backend on pushes to `main`/`master`.
+## Running only the backend
+If you just want the backend and not Docker, make sure PostgreSQL is running locally and set `POSTGRES_HOST=localhost` in `backend/.env`. Then start the backend from the `backend` folder with uvicorn.
 
-- Configure a Render service to deploy the backend from Docker Hub or from your GitHub repo.
-- Add the repository secrets:
-  - `RENDER_SERVICE_ID` — your Render service ID
-  - `RENDER_API_KEY` — your Render API key
-- If your frontend is deployed to GitHub Pages, also add `VITE_API_URL` as a secret so the production build can target the hosted backend.
-
-The Render deploy workflow is:
-
-```text
-.github/workflows/backend-deploy-render.yml
-```
-
-### Local backend only
-If you want to run only the backend without Docker, ensure PostgreSQL is running locally and set `POSTGRES_HOST=localhost` in `backend/.env`.
-
-Then start the backend with:
-```bash
-cd backend
-python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
-```
+If you want, I can also make this README even more conversational and remove the remaining technical formatting so it feels even less robotic.
